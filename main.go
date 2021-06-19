@@ -13,11 +13,11 @@ import (
 
 var (
 	listen   = flag.String("listen", ":8090", "listen")
-	userName = flag.String("userName", "huangshijie", "db userName")
-	password = flag.String("password", "123456", "db password")
-	ip       = flag.String("ip", "hsj.flyaha.top", "db host")
+	userName = flag.String("userName", "xxxxx", "db userName")
+	password = flag.String("password", "xxxxx", "db password")
+	ip       = flag.String("ip", "127.0.0.1", "db host")
 	port     = flag.String("port", "3306", "db port")
-	dbName   = flag.String("dbName", "yyh", "db Name")
+	dbName   = flag.String("dbName", "test", "db Name")
 )
 
 func init() {

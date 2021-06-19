@@ -60,53 +60,54 @@ func (s *StudentDB) SaveStudentsScore(sql string, students []Student) error {
 
 func (s *StudentDB) SelectStudentsScoreByName(sort, order string) ([]Student, error) {
 
-	sql := "select * from student where user_name = ? ORDER BY ? ?"
-	return s.singleCondition(sort, order, sql, s.UserName)
+	sql := "select * from student where user_name = ? ORDER BY " + sort + " " + order
+	return s.singleCondition(sql, s.UserName)
 }
 
 func (s *StudentDB) SelectStudentsScoreByClass(sort, order string) ([]Student, error) {
 
-	sql := "select * from student where class = ? ORDER BY ? ?"
-	return s.singleCondition(sort, order, sql, s.Class)
+	sql := "select * from student where class = ? ORDER BY " + sort + " " + order
+	return s.singleCondition(sql, s.Class)
 }
 
-func (s *StudentDB) singleCondition(sort string, order string, sql string, condition interface{}) ([]Student, error) {
+func (s *StudentDB) singleCondition(sql string, condition interface{}) ([]Student, error) {
 	prepare, PrepareErr := s.DB.Prepare(sql)
 	if PrepareErr != nil {
 		return nil, PrepareErr
 	}
-	query, QueryErr := prepare.Query(condition, order, sort)
+	query, QueryErr := prepare.Query(condition)
+
 	if QueryErr != nil {
 		return nil, QueryErr
 	}
 	students := make([]Student, 0)
 	for query.Next() {
-		student := &Student{}
-		if err := query.Scan(student.Id, student.UserName, student.Class, student.Subject, student.Score); err != nil {
+		student := Student{}
+		if err := query.Scan(&student.Id, &student.UserName, &student.Class, &student.Subject, &student.Score); err != nil {
 			log.Println(err.Error())
 		}
-		students = append(students, *student)
+		students = append(students, student)
 	}
 	return students, nil
 }
 
 func (s *StudentDB) SelectStudentsScoreByClassAndName(sort, order string) ([]Student, error) {
-	sql := "select * from student where class = ? and user_name = ? ORDER BY ? ?"
+	sql := "select * from student where class = ? and user_name = ? ORDER BY " + sort + " " + order
 	prepare, PrepareErr := s.DB.Prepare(sql)
 	if PrepareErr != nil {
 		return nil, PrepareErr
 	}
-	query, QueryErr := prepare.Query(s.Class, s.UserName, order, sort)
+	query, QueryErr := prepare.Query(s.Class, s.UserName)
 	if QueryErr != nil {
 		return nil, QueryErr
 	}
 	students := make([]Student, 0)
 	for query.Next() {
-		student := &Student{}
-		if err := query.Scan(student.Id, student.UserName, student.Class, student.Subject, student.Score); err != nil {
+		student := Student{}
+		if err := query.Scan(&student.Id, &student.UserName, &student.Class, &student.Subject, &student.Score); err != nil {
 			log.Println(err.Error())
 		}
-		students = append(students, *student)
+		students = append(students, student)
 	}
 	return students, nil
 }
