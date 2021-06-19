@@ -1,3 +1,5 @@
+create database yyh default character set utf8mb4 collate utf8mb4_unicode_ci;
+use yyh;
 CREATE TABLE `student` (
     `id` bigint(255) NOT NULL AUTO_INCREMENT COMMENT ' ',
     `user_name` varchar(255) NOT NULL DEFAULT '',
