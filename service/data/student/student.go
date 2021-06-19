@@ -28,7 +28,7 @@ func NewStudentDB() *StudentDB {
 }
 
 func (s *StudentDB) SaveOneStudentScore() error {
-	sql := "INSERT INTO student(`user_name`, `class`, `subject`, `score`) VALUES (?, ?, ?, ?);"
+	sql := "INSERT INTO student(`user_name`, `class`, `subject`, `score`) VALUES (?, ?, ?, ?)"
 	prepare, PrepareErr := s.DB.Prepare(sql)
 	if PrepareErr != nil {
 		return PrepareErr

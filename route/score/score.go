@@ -14,11 +14,7 @@ func UploadScore(res http.ResponseWriter, req *http.Request) error {
 		return err
 	}
 	for s := range req.MultipartForm.File {
-		for i := range req.MultipartForm.File[s] {
-			file, _ := req.MultipartForm.File[s][i].Open()
-			//go page.SaveScore(file)
-			page.SaveOneStudentScore(file)
-		}
+		go page.SaveScore(req.MultipartForm.File[s])
 	}
 	_, err := res.Write([]byte(`{"message":"success"}`))
 	if err != nil {
