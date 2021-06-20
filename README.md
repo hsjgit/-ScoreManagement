@@ -20,3 +20,10 @@ graph TB
     result -->err[统一错误处理]
 ```
 
+## 启动后
+
+1. 进入项目跟目录
+
+2. 运行 `docker build -t score:0.0.1 .`
+
+3. 运行 `docker run -p 8080:80 --name score -d score:0.0.1`
