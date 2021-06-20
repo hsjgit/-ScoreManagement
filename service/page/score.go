@@ -104,14 +104,13 @@ func SelectStudentScore(condition lib.ReqGetStudentScore) ([]student.Student, er
 
 	switch {
 	case studentDB.UserName != "" && studentDB.Class == "":
-		students, err := studentDB.SelectStudentsScoreByName(condition.Sort, condition.Order)
+		students, err := studentDB.SelectStudentsScoreByName(condition.Sort, condition.Order, condition.Page, condition.PageSize)
 		return students, err
 	case studentDB.UserName == "" && studentDB.Class != "":
-		students, err := studentDB.SelectStudentsScoreByClass(condition.Sort, condition.Order)
+		students, err := studentDB.SelectStudentsScoreByClass(condition.Sort, condition.Order, condition.Page, condition.PageSize)
 		return students, err
 	default:
-		students, err := studentDB.SelectStudentsScoreByClassAndName(condition.Sort, condition.Order)
+		students, err := studentDB.SelectStudentsScoreByClassAndName(condition.Sort, condition.Order, condition.Page, condition.PageSize)
 		return students, err
 	}
-
 }

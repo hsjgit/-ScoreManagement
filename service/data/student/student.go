@@ -3,6 +3,7 @@ package student
 import (
 	"database/sql"
 	"log"
+	"strconv"
 
 	"github.com/ScoreManagement/lib/db"
 )
@@ -58,15 +59,18 @@ func (s *StudentDB) SaveStudentsScore(sql string, students []Student) error {
 
 }
 
-func (s *StudentDB) SelectStudentsScoreByName(sort, order string) ([]Student, error) {
-
-	sql := "select * from student where user_name = ? ORDER BY " + sort + " " + order
+func (s *StudentDB) SelectStudentsScoreByName(sort, order string, page, pageSize int) ([]Student, error) {
+	sql := "select * from student where user_name = ? ORDER BY " +
+		sort + " " + order +
+		" LIMIT " + strconv.Itoa(pageSize) + " OFFSET " + strconv.Itoa((page-1)*pageSize)
 	return s.singleCondition(sql, s.UserName)
 }
 
-func (s *StudentDB) SelectStudentsScoreByClass(sort, order string) ([]Student, error) {
+func (s *StudentDB) SelectStudentsScoreByClass(sort, order string, page, pageSize int) ([]Student, error) {
 
-	sql := "select * from student where class = ? ORDER BY " + sort + " " + order
+	sql := "select * from student where class = ? ORDER BY " +
+		sort + " " + order +
+		" LIMIT " + strconv.Itoa(pageSize) + " OFFSET " + strconv.Itoa((page-1)*pageSize)
 	return s.singleCondition(sql, s.Class)
 }
 
@@ -91,8 +95,10 @@ func (s *StudentDB) singleCondition(sql string, condition interface{}) ([]Studen
 	return students, nil
 }
 
-func (s *StudentDB) SelectStudentsScoreByClassAndName(sort, order string) ([]Student, error) {
-	sql := "select * from student where class = ? and user_name = ? ORDER BY " + sort + " " + order
+func (s *StudentDB) SelectStudentsScoreByClassAndName(sort, order string, page, pageSize int) ([]Student, error) {
+	sql := "select * from student where class = ? and user_name = ? ORDER BY " +
+		sort + " " + order +
+		" LIMIT " + strconv.Itoa(pageSize) + " OFFSET " + strconv.Itoa((page-1)*pageSize)
 	prepare, PrepareErr := s.DB.Prepare(sql)
 	if PrepareErr != nil {
 		return nil, PrepareErr

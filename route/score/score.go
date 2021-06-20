@@ -16,7 +16,15 @@ func UploadScore(res http.ResponseWriter, req *http.Request) error {
 	for s := range req.MultipartForm.File {
 		go page.SaveScore(req.MultipartForm.File[s])
 	}
-	_, err := res.Write([]byte(`{"message":"success"}`))
+	resUpload := lib.ResUploadStudentScore{
+		Code:    1,
+		Message: "success",
+	}
+	marshal, MarshalErr := json.Marshal(resUpload)
+	if MarshalErr != nil {
+		return MarshalErr
+	}
+	_, err := res.Write(marshal)
 	if err != nil {
 		return err
 	}
@@ -36,7 +44,13 @@ func GetStudentScore(res http.ResponseWriter, req *http.Request) error {
 		log.Println(SelectStudentScoreErr.Error())
 		return SelectStudentScoreErr
 	}
-	marshal, MarshalErr := json.Marshal(students)
+	resStudents := lib.ResGetStudentScore{
+		Code:  1,
+		Data:  students,
+		Page:  condition.Page,
+		Count: 0,
+	}
+	marshal, MarshalErr := json.Marshal(resStudents)
 	if MarshalErr != nil {
 		return MarshalErr
 	}
