@@ -13,5 +13,7 @@ FROM scratch as prod
 COPY --from=build /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 COPY --from=build /go/release/app /
 COPY --from=build /go/release/vendor /vendor
+COPY --from=build /go/release/go.mod /
+COPY --from=build /go/release/go.sum /
 
 CMD ["/app"]
