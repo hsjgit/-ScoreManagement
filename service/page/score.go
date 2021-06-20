@@ -29,10 +29,10 @@ func SaveOneFile(file multipart.File) {
 	for scanner.Scan() {
 		s := student.Student{}
 		content := scanner.Text()
-		if content == "" {
+		if jump(content) {
 			continue
 		}
-		score := strings.Split(content, " ")
+		score := strings.Split(content, lib.CUP)
 		s.Class = score[0]
 		s.UserName = score[1]
 		float, _ := strconv.ParseFloat(score[2], 32)
@@ -56,6 +56,14 @@ func SaveOneFile(file multipart.File) {
 		Retry(studentDB, sql, students)
 	}
 
+}
+
+func jump(str string) bool {
+	switch str {
+	case " ":
+		return true
+	}
+	return false
 }
 
 func Retry(studentDB *student.StudentDB, sql string, students []student.Student) {
