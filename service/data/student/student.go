@@ -117,3 +117,45 @@ func (s *StudentDB) SelectStudentsScoreByClassAndName(sort, order string, page, 
 	}
 	return students, nil
 }
+
+func (s StudentDB) Count() (int64, error) {
+	sqlCount := ""
+	var err error
+	var count int64 = 0
+	var prepare *sql.Stmt
+	var rows *sql.Rows
+	switch {
+	case s.UserName != "" && s.Class == "":
+		sqlCount = "select count(*) as count from student where user_name = ?"
+		count, err = s.getCount(prepare, sqlCount, rows, []interface{}{s.UserName})
+
+	case s.UserName == "" && s.Class != "":
+		sqlCount = "select count(*) as count from student where class = ?"
+		count, err = s.getCount(prepare, sqlCount, rows, []interface{}{s.Class})
+
+	default:
+		sqlCount = "select count(*) as count from student where user_name = ? and class = ?"
+		count, err = s.getCount(prepare, sqlCount, rows, []interface{}{s.UserName, s.Class})
+	}
+	return count, err
+}
+
+func (s StudentDB) getCount(prepare *sql.Stmt, sqlCount string, rows *sql.Rows, condition []interface{}) (int64, error) {
+	var err error
+	prepare, err = s.DB.Prepare(sqlCount)
+	if err != nil {
+		return 0, err
+	}
+	rows, err = prepare.Query(condition...)
+	if err != nil {
+		return 0, err
+	}
+	count := int64(0)
+	for rows.Next() {
+		err = rows.Scan(&count)
+		if err != nil {
+			log.Println(err.Error())
+		}
+	}
+	return count, err
+}

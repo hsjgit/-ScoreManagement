@@ -3,7 +3,7 @@ package lib
 type ResGetStudentScore struct {
 	Code  int         `json:"code"`
 	Data  interface{} `json:"data"`
-	Count int         `json:"count"`
+	Count int64       `json:"count"`
 	Page  int         `json:"page"`
 }
 

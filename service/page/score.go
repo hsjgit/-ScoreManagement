@@ -122,3 +122,10 @@ func SelectStudentScore(condition lib.ReqGetStudentScore) ([]student.Student, er
 		return students, err
 	}
 }
+
+func SelectStudentScoreCount(condition lib.ReqGetStudentScore) (int64, error) {
+	studentDB := student.NewStudentDB()
+	studentDB.UserName = condition.UserName
+	studentDB.Class = condition.Class
+	return studentDB.Count()
+}
