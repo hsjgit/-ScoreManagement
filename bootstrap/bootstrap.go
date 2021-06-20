@@ -13,7 +13,6 @@ func Bootstrap(path, addr string) error {
 		return err
 	}
 	route.RegisterRoutes()
-	log.Println("Bootstrap /")
 	log.Println("listen " + addr)
 	return http.ListenAndServe(addr, nil)
 
