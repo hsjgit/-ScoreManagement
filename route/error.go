@@ -9,7 +9,7 @@ func errWrapper(handler appHandel) func(res http.ResponseWriter, req *http.Reque
 	return func(res http.ResponseWriter, req *http.Request) {
 		err := handler(res, req)
 		if err != nil {
-			code := http.StatusOK
+			code := http.StatusInternalServerError
 			switch {
 			}
 			http.Error(res, err.Error(), code)

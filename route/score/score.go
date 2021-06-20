@@ -2,6 +2,7 @@ package score
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 
 	"github.com/ScoreManagement/lib"
@@ -30,7 +31,11 @@ func GetStudentScore(res http.ResponseWriter, req *http.Request) error {
 		Order:    req.FormValue("order"),
 	}
 	GetStudentScoreParam(condition)
-	students := page.SelectStudentScore(*condition)
+	students, SelectStudentScoreErr := page.SelectStudentScore(*condition)
+	if SelectStudentScoreErr != nil {
+		log.Println(SelectStudentScoreErr.Error())
+		return SelectStudentScoreErr
+	}
 	marshal, MarshalErr := json.Marshal(students)
 	if MarshalErr != nil {
 		return MarshalErr

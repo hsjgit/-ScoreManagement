@@ -3,7 +3,6 @@ package page
 import (
 	"bufio"
 	"errors"
-	"fmt"
 	"log"
 	"mime/multipart"
 	"strconv"
@@ -15,7 +14,10 @@ import (
 
 func SaveScore(files []*multipart.FileHeader) {
 	for i := range files {
-		file, _ := files[i].Open()
+		file, err := files[i].Open()
+		if err != nil {
+			log.Println(err.Error())
+		}
 		go SaveOneFile(file)
 	}
 }
@@ -38,17 +40,43 @@ func SaveOneFile(file multipart.File) {
 		s.Subject = score[3]
 		students = append(students, s)
 		if len(students) == 300 {
-			sql, _ := buildSql(students)
-			studentDB.SaveStudentsScore(sql, students)
+			sql, err := buildSql(students)
+			if err != nil {
+				log.Println(err.Error())
+			}
+			if err := studentDB.SaveStudentsScore(sql, students); err != nil {
+				Retry(studentDB, sql, students)
+			}
 			students = students[:0]
 		}
 	}
 	sql, _ := buildSql(students)
-	err := studentDB.SaveStudentsScore(sql, students)
-	if err != nil {
+	if err := studentDB.SaveStudentsScore(sql, students); err != nil {
 		log.Println(err.Error())
+		Retry(studentDB, sql, students)
 	}
 
+}
+
+func Retry(studentDB *student.StudentDB, sql string, students []student.Student) {
+	count := 0
+	for ; count < 3; count++ {
+		if err := studentDB.SaveStudentsScore(sql, students); err == nil {
+			break
+		}
+	}
+	if count == 3 {
+		for i := range students {
+			studentDB.Score = students[i].Score
+			studentDB.UserName = students[i].UserName
+			studentDB.Class = students[i].Class
+			studentDB.Subject = students[i].Subject
+			if err := studentDB.SaveOneStudentScore(); err != nil {
+				log.Println(err.Error())
+			}
+
+		}
+	}
 }
 
 func buildSql(students []student.Student) (string, error) {
@@ -69,7 +97,7 @@ func buildSql(students []student.Student) (string, error) {
 	return sql[:len(sql)-1], nil
 }
 
-func SelectStudentScore(condition lib.ReqGetStudentScore) []student.Student {
+func SelectStudentScore(condition lib.ReqGetStudentScore) ([]student.Student, error) {
 	studentDB := student.NewStudentDB()
 	studentDB.UserName = condition.UserName
 	studentDB.Class = condition.Class
@@ -77,16 +105,13 @@ func SelectStudentScore(condition lib.ReqGetStudentScore) []student.Student {
 	switch {
 	case studentDB.UserName != "" && studentDB.Class == "":
 		students, err := studentDB.SelectStudentsScoreByName(condition.Sort, condition.Order)
-		if err != nil {
-			fmt.Println(err.Error())
-		}
-		return students
+		return students, err
 	case studentDB.UserName == "" && studentDB.Class != "":
-		students, _ := studentDB.SelectStudentsScoreByClass(condition.Sort, condition.Order)
-		return students
+		students, err := studentDB.SelectStudentsScoreByClass(condition.Sort, condition.Order)
+		return students, err
 	default:
-		students, _ := studentDB.SelectStudentsScoreByClassAndName(condition.Sort, condition.Order)
-		return students
+		students, err := studentDB.SelectStudentsScoreByClassAndName(condition.Sort, condition.Order)
+		return students, err
 	}
 
 }
